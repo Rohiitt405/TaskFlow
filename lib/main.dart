@@ -31,13 +31,16 @@ class TodoHomePage extends StatefulWidget {
 class _TodoHomePageState extends State<TodoHomePage> {
   // Controller to read text from TextField
   final TextEditingController _controller = TextEditingController();
+  final List<String> _task = [];
 
   // Simple function for the add button
   void _addTask() {
     String taskText = _controller.text.trim();
     if (taskText.isNotEmpty) {
-      print("Task added: $taskText"); // For now, just print to console
-      _controller.clear(); // Clear input after adding
+      setState(() {
+        _task.add(taskText);
+        _controller.clear(); // Clear input after adding
+      });
     }
   }
 
@@ -45,32 +48,56 @@ class _TodoHomePageState extends State<TodoHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My To-Do App 📝'),
+        title: const Text('ToDo List'),
         centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Row(
+        child: Column(
           children: [
-            // Text input field
-            Expanded(
-              child: TextField(
-                controller: _controller,
-                decoration: InputDecoration(
-                  labelText: 'Enter a task...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+            Row(
+              children: [
+                // Text input field
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    decoration: InputDecoration(
+                      labelText: 'Enter a task...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onSubmitted: (value) => _addTask(),
                   ),
                 ),
-                onSubmitted: (_) => _addTask(),
-              ),
+                const SizedBox(width: 10),
+                // Add button
+                FloatingActionButton.small(
+                  onPressed: _addTask,
+                  child: const Icon(Icons.add),
+                ),
+              ],
             ),
-            const SizedBox(width: 10),
-            // Add button
-            FloatingActionButton.small(
-              onPressed: _addTask,
-              child: const Icon(Icons.add),
-            ),
+            Expanded(
+              child: _task.isEmpty
+                ? const Center(
+                  child: Text(
+                    'No tasks yet!',
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                )
+                : ListView.builder(
+                  itemCount: _task.length,
+                  itemBuilder: (context, index) {
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 5),
+                      child: ListTile(
+                        title: Text(_task[index]),
+                      ),
+                    );
+                  },
+                )
+            )
           ],
         ),
       ),
