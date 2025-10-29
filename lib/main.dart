@@ -44,6 +44,20 @@ class _TodoHomePageState extends State<TodoHomePage> {
     }
   }
 
+  void _deleteTask(int index){
+    final deletedTask = _task[index];
+    setState(() {
+      _task.removeAt(index);
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Deleted: "$deletedTask"'),
+        duration: const Duration(seconds: 5),
+      )
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,7 +81,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    onSubmitted: (value) => _addTask(),
+                    onSubmitted: (_) => _addTask(),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -78,6 +92,8 @@ class _TodoHomePageState extends State<TodoHomePage> {
                 ),
               ],
             ),
+            const SizedBox(height: 20),
+
             Expanded(
               child: _task.isEmpty
                 ? const Center(
@@ -93,6 +109,11 @@ class _TodoHomePageState extends State<TodoHomePage> {
                       margin: const EdgeInsets.symmetric(vertical: 5),
                       child: ListTile(
                         title: Text(_task[index]),
+
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => _deleteTask(index),
+                        ),
                       ),
                     );
                   },
