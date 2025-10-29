@@ -71,6 +71,40 @@ class _TodoHomePageState extends State<TodoHomePage> {
     });
   }
 
+  void _editTask(int index) {
+    final task = _tasks[index];
+    final editController = TextEditingController(text: task.title);
+
+    showDialog(
+      context: context, 
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Task'),
+        content: TextField(
+          controller: editController,
+          autofocus: true,
+          decoration: const InputDecoration(
+            hintText: 'Enter new task name'
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+            setState(() {
+              task.title = editController.text.trim();
+            });
+            Navigator.pop(context);
+          }, 
+          child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -136,9 +170,18 @@ class _TodoHomePageState extends State<TodoHomePage> {
                         ),
                         onTap: () => _toggleTask(index),
 
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => _deleteTask(index),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.blue),
+                              onPressed: () => _editTask(index),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red,),
+                              onPressed: () => _deleteTask(index),
+                            )
+                          ],
                         ),
                       ),
                     );
