@@ -52,15 +52,23 @@ class _TodoHomePageState extends State<TodoHomePage> {
   }
 
   void _deleteTask(int index){
-    final deletedTask = _tasks[index].title;
+    final deletedTask = _tasks[index];
     setState(() {
       _tasks.removeAt(index);
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Deleted: "$deletedTask"'),
-        duration: const Duration(seconds: 5),
+        content: Text('Deleted: "${deletedTask.title}"'),
+        duration: const Duration(seconds: 3),
+        action: SnackBarAction(
+          label: 'Undo', 
+          onPressed: () {
+            setState(() {
+              _tasks.insert(index, deletedTask);              
+            });
+          }
+        ),
       )
     );
   }
@@ -133,7 +141,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
                 ),
                 const SizedBox(width: 10),
                 // Add button
-                FloatingActionButton.small(
+                FloatingActionButton(
                   onPressed: _addTask,
                   child: const Icon(Icons.add),
                 ),
