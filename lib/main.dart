@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const TodoApp());
@@ -26,6 +29,18 @@ class Task {
   bool isDone;
 
   Task({required this.title, this.isDone = false});
+
+  Map<String, dynamic> toMap() => {
+    'title': title,
+    'isDone': isDone,
+  };
+
+  factory Task.fromMap(Map<String, dynamic> map) {
+    return Task(
+      title: map['title'],
+      isDone: map['isDone'],
+    );
+  }
 }
 
 class TodoHomePage extends StatefulWidget {
@@ -40,6 +55,31 @@ class _TodoHomePageState extends State<TodoHomePage> {
   final TextEditingController _controller = TextEditingController();
   final List<Task> _tasks = [];
 
+  @override
+  void initState() {
+    super.initState();
+    _loadTasks();
+  }
+
+  Future<void> _saveTasks() async {
+    final prefs = await SharedPreferences.getInstance();
+    final taskList = _tasks.map((task) => task.toMap()).toList();
+    prefs.setString('tasks', jsonEncode(taskList));
+  }
+
+  Future<void> _loadTasks() async {
+    final prefs = await SharedPreferences.getInstance();
+    final storedData = prefs.getString('tasks');
+
+    if(storedData != null) {
+      final List decoded = jsonDecode(storedData);
+      setState(() {
+        _tasks.clear();
+        _tasks.addAll(decoded.map((e) => Task.fromMap(e)).toList());
+      });
+    }
+  }
+
   // Simple function for the add button
   void _addTask() {
     String taskText = _controller.text.trim();
@@ -48,6 +88,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
         _tasks.add(Task(title: taskText));
         _controller.clear(); // Clear input after adding
       });
+      _saveTasks();
     }
   }
 
@@ -56,6 +97,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
     setState(() {
       _tasks.removeAt(index);
     });
+    _saveTasks();
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -67,6 +109,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
             setState(() {
               _tasks.insert(index, deletedTask);              
             });
+            _saveTasks();
           }
         ),
       )
@@ -77,6 +120,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
     setState(() {
       _tasks[index].isDone = ! _tasks[index].isDone;
     });
+    _saveTasks();
   }
 
   void _editTask(int index) {
@@ -104,6 +148,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
             setState(() {
               task.title = editController.text.trim();
             });
+            _saveTasks();
             Navigator.pop(context);
           }, 
           child: const Text('Save'),
