@@ -117,7 +117,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ToDo List'),
+        title: const Text('Todo List'),
         centerTitle: true,
       ),
       body: Padding(
@@ -130,6 +130,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
                 Expanded(
                   child: TextField(
                     controller: _controller,
+                    textCapitalization: TextCapitalization.sentences,
                     decoration: InputDecoration(
                       labelText: 'Enter a task...',
                       border: OutlineInputBorder(
