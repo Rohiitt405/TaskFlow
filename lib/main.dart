@@ -161,35 +161,65 @@ class _TodoHomePageState extends State<TodoHomePage> {
                   itemCount: _tasks.length,
                   itemBuilder: (context, index) {
                     final task = _tasks[index];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(vertical: 5),
-                      child: ListTile(
-                        title: Text(
-                          task.title,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: task.isDone
-                              ? Colors.grey
-                              : Colors.black,
-                            decoration: task.isDone 
-                              ? TextDecoration.lineThrough
-                              : TextDecoration.none,
-                          ),
-                        ),
-                        onTap: () => _toggleTask(index),
 
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
+                    return Dismissible(
+                      key: UniqueKey(),
+                      background: Container(
+                        color: Colors.red[400],
+                        alignment: Alignment.centerLeft,
+                        padding: const EdgeInsets.only(left: 15),
+
+                        child: Row(
                           children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit, color: Colors.blue),
-                              onPressed: () => _editTask(index),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red,),
-                              onPressed: () => _deleteTask(index),
-                            )
+                            Icon(Icons.delete, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text('Delete', style: TextStyle(color: Colors.white)),
                           ],
+                        ),
+                      ),
+
+                      secondaryBackground: Container(
+                        color: Colors.blue[400],
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: 15),
+
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Icon(Icons.edit, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text('Edit', style: TextStyle(color: Colors.white)),
+                          ],
+                        ),
+                      ),
+
+                      confirmDismiss: (direction) async {
+                        if(direction == DismissDirection.startToEnd) {
+                          _deleteTask(index);
+                          return true;
+                        } else if (direction == DismissDirection.endToStart) {
+                          _editTask(index);
+                          return false;
+                        }
+                        return false;
+                      },
+
+                      child: Card(
+                        margin: const EdgeInsets.symmetric(vertical: 5),
+                        child: ListTile(
+                          title: Text(
+                            task.title,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: task.isDone
+                                ? Colors.grey
+                                : Colors.black,
+                              decoration: task.isDone 
+                                ? TextDecoration.lineThrough
+                                : TextDecoration.none,
+                            ),
+                          ),
+                          onTap: () => _toggleTask(index),
                         ),
                       ),
                     );
