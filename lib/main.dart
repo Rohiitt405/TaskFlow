@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -52,13 +51,16 @@ class TodoHomePage extends StatefulWidget {
 
 class _TodoHomePageState extends State<TodoHomePage> {
   // Controller to read text from TextField
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _taskController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   final List<Task> _tasks = [];
+  List<Task> _filteredTasks = [];
 
   @override
   void initState() {
     super.initState();
     _loadTasks();
+    _searchController.addListener(_filterTask);
   }
 
   Future<void> _saveTasks() async {
@@ -76,17 +78,33 @@ class _TodoHomePageState extends State<TodoHomePage> {
       setState(() {
         _tasks.clear();
         _tasks.addAll(decoded.map((e) => Task.fromMap(e)).toList());
+        _filteredTasks = List.from(_tasks);
       });
     }
   }
 
+  void _filterTask(){
+    String query = _searchController.text.trim().toLowerCase();
+
+    setState(() {
+      if(query.isEmpty){
+        _filteredTasks = List.from(_tasks);
+      } else {
+        _filteredTasks = _tasks
+          .where((task) => task.title.toLowerCase().contains(query))
+          .toList();
+      }
+    });
+  }
+
   // Simple function for the add button
   void _addTask() {
-    String taskText = _controller.text.trim();
-    if (taskText.isNotEmpty) {
+    String text = _taskController.text.trim();
+    if (text.isNotEmpty) {
       setState(() {
-        _tasks.add(Task(title: taskText));
-        _controller.clear(); // Clear input after adding
+        _tasks.add(Task(title: text));
+        _filteredTasks = List.from(_tasks);
+        _taskController.clear(); // Clear input after adding
       });
       _saveTasks();
     }
@@ -94,8 +112,11 @@ class _TodoHomePageState extends State<TodoHomePage> {
 
   void _deleteTask(int index){
     final deletedTask = _tasks[index];
+    final actualIndex = _tasks.indexOf(deletedTask);
+
     setState(() {
       _tasks.removeAt(index);
+      _filteredTasks.removeAt(index);
     });
     _saveTasks();
 
@@ -107,7 +128,8 @@ class _TodoHomePageState extends State<TodoHomePage> {
           label: 'Undo', 
           onPressed: () {
             setState(() {
-              _tasks.insert(index, deletedTask);              
+              _tasks.insert(index, deletedTask); 
+              _filteredTasks = List.from(_tasks);             
             });
             _saveTasks();
           }
@@ -117,14 +139,19 @@ class _TodoHomePageState extends State<TodoHomePage> {
   }
 
   void _toggleTask(int index){
+    final task = _filteredTasks[index];
+    final realIndex = _tasks.indexOf(task);
+
     setState(() {
       _tasks[index].isDone = ! _tasks[index].isDone;
+      _filteredTasks[index].isDone = !_filteredTasks[index].isDone;
     });
     _saveTasks();
   }
 
   void _editTask(int index) {
     final task = _tasks[index];
+    final actualIndex = _tasks.indexOf(task);
     final editController = TextEditingController(text: task.title);
 
     showDialog(
@@ -146,7 +173,8 @@ class _TodoHomePageState extends State<TodoHomePage> {
           ElevatedButton(
             onPressed: () {
             setState(() {
-              task.title = editController.text.trim();
+              _tasks[actualIndex].title = editController.text.trim();
+              _filteredTasks[index].title = editController.text.trim();
             });
             _saveTasks();
             Navigator.pop(context);
@@ -156,6 +184,13 @@ class _TodoHomePageState extends State<TodoHomePage> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _taskController.dispose();
+    super.dispose();
   }
 
   @override
@@ -169,12 +204,24 @@ class _TodoHomePageState extends State<TodoHomePage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                labelText: 'Search tasks...',
+                prefixIcon: const Icon(Icons.search_rounded),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                )
+              ),
+            ),
+            const SizedBox(height: 15),
+
             Row(
               children: [
                 // Text input field
                 Expanded(
                   child: TextField(
-                    controller: _controller,
+                    controller: _taskController,
                     textCapitalization: TextCapitalization.sentences,
                     decoration: InputDecoration(
                       labelText: 'Enter a task...',
@@ -196,47 +243,33 @@ class _TodoHomePageState extends State<TodoHomePage> {
             const SizedBox(height: 20),
 
             Expanded(
-              child: _tasks.isEmpty
+              child: _filteredTasks.isEmpty
                 ? const Center(
                   child: Text(
-                    'No tasks yet!',
+                    'No tasks found!',
                     style: TextStyle(fontSize: 18, color: Colors.grey),
                   ),
                 )
                 : ListView.builder(
-                  itemCount: _tasks.length,
+                  itemCount: _filteredTasks.length,
                   itemBuilder: (context, index) {
-                    final task = _tasks[index];
+                    final task = _filteredTasks[index];
 
                     return Dismissible(
                       key: UniqueKey(),
                       background: Container(
                         color: Colors.red[400],
                         alignment: Alignment.centerLeft,
-                        padding: const EdgeInsets.only(left: 15),
-
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete, color: Colors.white),
-                            SizedBox(width: 8),
-                            Text('Delete', style: TextStyle(color: Colors.white)),
-                          ],
-                        ),
+                        padding: const EdgeInsets.only(left: 20),
+                        child: const Icon(Icons.delete, color: Colors.white),
                       ),
 
                       secondaryBackground: Container(
                         color: Colors.blue[400],
                         alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 15),
+                        padding: const EdgeInsets.only(right: 20),
+                        child: const Icon(Icons.edit, color: Colors.white),
 
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Icon(Icons.edit, color: Colors.white),
-                            SizedBox(width: 8),
-                            Text('Edit', style: TextStyle(color: Colors.white)),
-                          ],
-                        ),
                       ),
 
                       confirmDismiss: (direction) async {
