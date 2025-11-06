@@ -210,7 +210,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
                 labelText: 'Search tasks...',
                 prefixIcon: const Icon(Icons.search_rounded),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(50),
                 )
               ),
             ),
@@ -228,15 +228,14 @@ class _TodoHomePageState extends State<TodoHomePage> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.add_rounded, size: 30, color: Colors.grey[800]),
+                        onPressed: _addTask,
+                        tooltip: 'Add Task',
+                      ),
                     ),
                     onSubmitted: (_) => _addTask(),
                   ),
-                ),
-                const SizedBox(width: 10),
-                // Add button
-                FloatingActionButton(
-                  onPressed: _addTask,
-                  child: const Icon(Icons.add),
                 ),
               ],
             ),
