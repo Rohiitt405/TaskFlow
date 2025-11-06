@@ -55,6 +55,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
   final TextEditingController _searchController = TextEditingController();
   final List<Task> _tasks = [];
   List<Task> _filteredTasks = [];
+  bool _isSearching = false;
 
   @override
   void initState() {
@@ -143,7 +144,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
     final realIndex = _tasks.indexOf(task);
 
     setState(() {
-      _tasks[index].isDone = ! _tasks[index].isDone;
+      _tasks[realIndex].isDone = ! _tasks[realIndex].isDone;
       _filteredTasks[index].isDone = !_filteredTasks[index].isDone;
     });
     _saveTasks();
@@ -204,40 +205,62 @@ class _TodoHomePageState extends State<TodoHomePage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                labelText: 'Search tasks...',
-                prefixIcon: const Icon(Icons.search_rounded),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
-                )
-              ),
-            ),
-            const SizedBox(height: 15),
-
-            Row(
-              children: [
-                // Text input field
-                Expanded(
-                  child: TextField(
-                    controller: _taskController,
-                    textCapitalization: TextCapitalization.sentences,
-                    decoration: InputDecoration(
-                      labelText: 'Enter a task...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      suffixIcon: IconButton(
-                        icon: Icon(Icons.add_rounded, size: 30, color: Colors.grey[800]),
-                        onPressed: _addTask,
-                        tooltip: 'Add Task',
-                      ),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              child: TextField(
+                controller: _isSearching ? _searchController : _taskController,
+                autofocus: false,
+                textCapitalization: TextCapitalization.sentences,
+                onChanged: _isSearching ? (_) => _filterTask() : null,
+                onSubmitted: (value) {
+                  if(_isSearching){
+                    _filterTask();
+                  } else {
+                    _addTask();
+                  }
+                },
+                decoration: InputDecoration(
+                  hintText: _isSearching ? 'Search tasks...' : 'Enter a task...',
+                  prefixIcon: IconButton(
+                    icon: Icon(
+                      Icons.search_rounded,
+                      color: _isSearching ? Colors.blue : Colors.grey[800],
                     ),
-                    onSubmitted: (_) => _addTask(),
+                    onPressed: () {
+                      setState(() {
+                        _isSearching = !_isSearching;
+                        if(!_isSearching){
+                          _searchController.clear();
+                          _filteredTasks = List.from(_tasks);
+                        }
+                      });
+                    },
                   ),
+                  suffixIcon: IconButton(
+                    icon: Icon(_isSearching ? Icons.close_rounded : Icons.add_rounded,
+                    color: Colors.grey[800],
+                    size: 28
+                    ),
+                    tooltip: _isSearching ? 'Close search' : 'Add Task',
+                    onPressed: () {
+                      if (_isSearching){
+                        setState(() {
+                          _isSearching = false;
+                          _searchController.clear();
+                          _filteredTasks = List.from(_tasks);
+                        });
+                      } else {
+                        _addTask();
+                      }
+                    },
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                 ),
-              ],
+              ),
             ),
             const SizedBox(height: 20),
 
