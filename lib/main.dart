@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'dart:io';
 
 void main() {
   runApp(const TodoApp());
@@ -64,6 +67,60 @@ class _TodoHomePageState extends State<TodoHomePage> {
     super.initState();
     _loadTasks();
     _searchController.addListener(_filterTask);
+  }
+
+  Future<void> _addTasksFromImage() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? pickedFile = await picker.pickImage(source: ImageSource.camera);
+
+      if(pickedFile == null)  return;
+
+      final File imageFile = File(pickedFile.path);
+      final textRecognizer = TextRecognizer();
+
+      final RecognizedText recognizedText = await textRecognizer.processImage(InputImage.fromFile(imageFile));
+
+      await textRecognizer.close();
+
+      final extractedText = recognizedText.text.trim();
+
+      if(extractedText.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No text detected in the image.')),
+        );
+        return;
+      }
+
+      final List<String> taskLines = extractedText.split('\n')
+        .map((line) => line.trim())
+        .where((line) => line.isNotEmpty)
+        .toList();
+
+      if(taskLines.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No valid tasks found in image.')),
+        );
+        return;
+      }
+
+      setState(() {
+        for(var line in taskLines){
+          _tasks.add(Task(title: line));
+        }
+        _filteredTasks = List.from(_tasks);
+      });
+
+      await _saveTasks();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Added ${taskLines.length} image!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
   }
 
   Future<void> _playSound(String path) async {
@@ -250,23 +307,33 @@ class _TodoHomePageState extends State<TodoHomePage> {
                       });
                     },
                   ),
-                  suffixIcon: IconButton(
-                    icon: Icon(_isSearching ? Icons.close_rounded : Icons.add_rounded,
-                    color: Colors.grey[800],
-                    size: 28
-                    ),
-                    tooltip: _isSearching ? 'Close search' : 'Add Task',
-                    onPressed: () {
-                      if (_isSearching){
-                        setState(() {
-                          _isSearching = false;
-                          _searchController.clear();
-                          _filteredTasks = List.from(_tasks);
-                        });
-                      } else {
-                        _addTask();
-                      }
-                    },
+                  suffixIcon: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.camera_sharp, size: 26),
+                        tooltip: 'Add from Image',
+                        onPressed: _addTasksFromImage,
+                      ),
+                      IconButton(
+                        icon: Icon(_isSearching ? Icons.close_rounded : Icons.add_rounded,
+                        color: Colors.grey[800],
+                        size: 28
+                        ),
+                        tooltip: _isSearching ? 'Close search' : 'Add Task',
+                        onPressed: () {
+                          if (_isSearching){
+                            setState(() {
+                              _isSearching = false;
+                              _searchController.clear();
+                              _filteredTasks = List.from(_tasks);
+                            });
+                          } else {
+                            _addTask();
+                          }
+                        },
+                      ),
+                    ],
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(50),
