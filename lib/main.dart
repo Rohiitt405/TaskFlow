@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -50,6 +51,7 @@ class TodoHomePage extends StatefulWidget {
 }
 
 class _TodoHomePageState extends State<TodoHomePage> {
+  final AudioPlayer _audioPlayer = AudioPlayer();
   // Controller to read text from TextField
   final TextEditingController _taskController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
@@ -62,6 +64,10 @@ class _TodoHomePageState extends State<TodoHomePage> {
     super.initState();
     _loadTasks();
     _searchController.addListener(_filterTask);
+  }
+
+  Future<void> _playSound(String path) async {
+    await _audioPlayer.play(AssetSource(path));
   }
 
   Future<void> _saveTasks() async {
@@ -108,6 +114,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
         _taskController.clear(); // Clear input after adding
       });
       _saveTasks();
+      _playSound('sounds/Add.mp3');
     }
   }
 
@@ -120,6 +127,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
       _filteredTasks.removeAt(index);
     });
     _saveTasks();
+    _playSound('sounds/Delete.mp3');
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -178,6 +186,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
               _filteredTasks[index].title = editController.text.trim();
             });
             _saveTasks();
+            _playSound('sounds/Edit.mp3');
             Navigator.pop(context);
           }, 
           child: const Text('Save'),
@@ -189,8 +198,10 @@ class _TodoHomePageState extends State<TodoHomePage> {
 
   @override
   void dispose() {
+    _searchController.removeListener(_filterTask);
     _searchController.dispose();
     _taskController.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -230,7 +241,9 @@ class _TodoHomePageState extends State<TodoHomePage> {
                     onPressed: () {
                       setState(() {
                         _isSearching = !_isSearching;
-                        if(!_isSearching){
+                        if (_isSearching){
+                          _playSound('sounds/Search.mp3');
+                        } else {
                           _searchController.clear();
                           _filteredTasks = List.from(_tasks);
                         }
