@@ -4,6 +4,7 @@ import '../controllers/task_controller.dart';
 import '../models/task.dart';
 import '../services/audio_service.dart';
 import '../services/image_task_service.dart';
+import '../helpers/snackbar_helper.dart';
 
 class TodoHomePage extends StatefulWidget {
   const TodoHomePage({super.key});
@@ -123,7 +124,10 @@ class _TodoHomePageState extends State<TodoHomePage> {
       final taskLines = await _imageTaskService.extractTasksFromCamera();
 
       if(taskLines.isEmpty) {
-        _showMessage("No valid tasks found in the image.");
+        SnackBarHelper.show(
+          context, 
+          'No valid tasks found in the image.',
+        );
         return;
       }
 
@@ -137,12 +141,16 @@ class _TodoHomePageState extends State<TodoHomePage> {
 
       await _playSound('sounds/Add.mp3');
 
-      _showMessage(
+      SnackBarHelper.show(
+        context,
         'Added ${taskLines.length} task${taskLines.length == 1 ? '' : 's'} from the image.',
       );
 
     } catch (error) {
-      _showMessage('Error: $error');
+      SnackBarHelper.show(
+        context,
+        'Error: $error'
+      );
     }
   }
 
@@ -163,22 +171,20 @@ class _TodoHomePageState extends State<TodoHomePage> {
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Deleted: "${task.title}"'),
-        duration: const Duration(seconds: 3),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () async {
-            await _taskController.restoreTask(deletedTask);
+    SnackBarHelper.show(
+      context,
+      'Deleted: "${task.title}"',
+      action: SnackBarAction(
+        label: 'Undo',
+        onPressed: () async {
+          await _taskController.restoreTask(deletedTask);
 
-            if(!mounted) {
-              return;
-            }
+          if(!mounted) {
+            return;
+          }
 
-            setState(_syncTaskFromController);
-          },
-        ),
+          setState(_syncTaskFromController);
+        },
       ),
     );
   }
@@ -259,16 +265,6 @@ class _TodoHomePageState extends State<TodoHomePage> {
           ],
         );
       },
-    );
-  }
-
-  void _showMessage(String message) {
-    if (!mounted) {
-      return;
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
     );
   }
 

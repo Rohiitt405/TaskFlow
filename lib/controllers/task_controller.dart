@@ -9,7 +9,6 @@ class TaskController extends ChangeNotifier {
   }) : _taskStorage = taskStorage ?? TaskStorage();
 
   final TaskStorage _taskStorage;
-
   final List<Task> _tasks = [];
 
   List<Task> get tasks => List.unmodifiable(_tasks);
@@ -43,7 +42,6 @@ class TaskController extends ChangeNotifier {
     );
 
     await saveTasks();
-
     notifyListeners();
   }
 
@@ -57,12 +55,12 @@ class TaskController extends ChangeNotifier {
 
       _tasks.add(
         Task(
-          id: _createTaskId(), title: text
+          id: _createTaskId(), 
+          title: text
         ),
       );
 
       await saveTasks();
-      
       notifyListeners();
     }
   }
@@ -73,7 +71,6 @@ class TaskController extends ChangeNotifier {
     );
 
     await saveTasks();
-
     notifyListeners();
   }
 
@@ -85,7 +82,6 @@ class TaskController extends ChangeNotifier {
     _tasks.add(task);
 
     await saveTasks();
-
     notifyListeners();
   }
 
@@ -97,7 +93,6 @@ class TaskController extends ChangeNotifier {
     taskToUpdate.isDone = !taskToUpdate.isDone;
 
     await saveTasks();
-
     notifyListeners();
   }
 
@@ -118,7 +113,6 @@ class TaskController extends ChangeNotifier {
     taskToUpdate.title = title;
 
     await saveTasks();
-
     notifyListeners();
   }
 }
