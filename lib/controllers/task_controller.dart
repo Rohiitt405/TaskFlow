@@ -5,7 +5,7 @@ import '../services/task_storage.dart';
 
 class TaskController extends ChangeNotifier {
   TaskController({
-    TaskStorage? taskStorage,
+    required TaskStorage? taskStorage,
   }) : _taskStorage = taskStorage ?? TaskStorage();
 
   final TaskStorage _taskStorage;

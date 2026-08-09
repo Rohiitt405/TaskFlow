@@ -6,6 +6,7 @@ import '../services/audio_service.dart';
 import '../services/image_task_service.dart';
 import '../helpers/snackbar_helper.dart';
 import '../constants/app_sounds.dart';
+import '../services/task_storage.dart';
 
 class TodoHomePage extends StatefulWidget {
   const TodoHomePage({super.key});
@@ -16,7 +17,9 @@ class TodoHomePage extends StatefulWidget {
 
 class _TodoHomePageState extends State<TodoHomePage> {
   final AudioService _audioService = AudioService();
-  final TaskController _taskController = TaskController();
+  final TaskController _taskController = TaskController(
+    taskStorage: TaskStorage(),
+  );
   final ImageTaskService _imageTaskService = ImageTaskService();
 
   final TextEditingController _taskInputController = TextEditingController();
