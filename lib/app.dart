@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/todo_home_page.dart';
+import './screens/splash_screen.dart';
 
 class TodoApp extends StatelessWidget {
   const TodoApp({super.key});
@@ -18,7 +18,7 @@ class TodoApp extends StatelessWidget {
           elevation: 0,
         )
       ),
-      home: const TodoHomePage(),
+      home: const SplashScreen(),
     );
   }
 }

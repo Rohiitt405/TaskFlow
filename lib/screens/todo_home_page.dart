@@ -287,7 +287,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
         elevation: 0,
         centerTitle: true,
         title: const Text(
-          'Todo List',
+          'TASK FLOW',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
