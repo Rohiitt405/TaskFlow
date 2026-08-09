@@ -1,173 +1,204 @@
-# 📋 Flutter Todo List
+# 📋 TaskFlow — Flutter Todo List
 
-A lightweight and user-friendly **Todo List** application built with **Flutter**. It provides an intuitive interface for managing daily tasks, supports local data persistence, and includes OCR-powered task creation from images.
+A lightweight and user-friendly **Todo List application built with Flutter** for managing daily tasks with local persistence, search, editing, completion tracking, audio feedback, and OCR-powered task creation from images.
 
 ---
 
 ## 🌟 Overview
 
-This application helps users organize their daily activities by allowing them to:
+**TaskFlow** is an offline-first Flutter todo application designed to keep task management simple and practical.
 
-- Create and manage tasks
-- Search tasks instantly
-- Edit or delete tasks
-- Mark tasks as completed
-- Import tasks from images using on-device text recognition
-- Save tasks locally for offline access
+Users can:
 
----
-
-## 🚀 Features
-
-- 📝 Create new tasks
-- 🔍 Live task search
-- ✅ Complete or uncomplete tasks
+- 📝 Create tasks
+- 🔍 Search tasks instantly
 - ✏️ Edit task titles
-- 🗑️ Swipe to delete tasks
-- 💾 Local storage using SharedPreferences
-- 📸 OCR-based task import from images
-- 🔊 Simple audio feedback for user actions
-- 🎨 Modern Material 3 design
+- ✅ Mark tasks as completed or incomplete
+- 🗑️ Delete tasks with swipe actions
+- 💾 Persist tasks locally on the device
+- 📸 Extract text from images and use it to create tasks
+- 🔊 Get audio feedback for supported user actions
+
+The application does not require a backend or an internet connection for its core task-management functionality.
 
 ---
 
-## 🛠️ Built With
+## ✨ Features
 
-- **Flutter**
-- **Dart**
-- **Material 3**
-- **SharedPreferences**
-- **Google ML Kit Text Recognition**
-- **Image Picker**
-- **Audio Players**
+### 📝 Task Management
+
+- Create new tasks
+- Edit existing task titles
+- Mark tasks as completed or incomplete
+- Delete tasks using swipe actions
+- Persist tasks between application launches
+
+### 🔍 Task Search
+
+- Live search through existing tasks
+- Filter tasks as the user types
+
+### 📸 OCR Task Import
+
+- Select or capture an image using the image picker
+- Extract text from the image using **Google ML Kit Text Recognition**
+- Convert detected text into tasks
+
+### 💾 Local Storage
+
+- Store tasks locally using **SharedPreferences**
+- Access tasks without a backend
+- Preserve tasks after restarting the application
+
+### 🔊 Audio Feedback
+
+- Provide audio feedback for supported user actions
+- Keep audio-related logic separated inside the audio service
+
+### 🎨 User Interface
+
+- Material 3 design
+- Clean and lightweight interface
+- Reusable task input widget
+- Snackbar-based user feedback
 
 ---
+
+## 🛠️ Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| **Flutter** | Application framework |
+| **Dart** | Programming language |
+| **Material 3** | UI and design system |
+| **SharedPreferences** | Local task persistence |
+| **Google ML Kit Text Recognition** | OCR and text extraction |
+| **Image Picker** | Camera and gallery image selection |
+| **Audioplayers** | Audio feedback |
+
+---
+
+## 📦 Dependencies
+
+```yaml
+dependencies:
+  shared_preferences: ^2.5.3              # stores task data locally on the device
+  audioplayers: ^6.5.1                    # provides audio playback for user feedback
+  google_mlkit_text_recognition: ^0.16.0  # extracts text from images using OCR
+  image_picker: ^1.2.0                    # selects images from the camera or gallery
+  cupertino_icons: ^1.0.8                 # provides icons for iOS-style UI
+```
+
+----
 
 ## 📂 Project Structure
 
-```
+```text
 lib/
 │
-├── main.dart
+├── constants/
+│   └── app_sounds.dart
+│
+├── controllers/
+│   └── task_controller.dart
+│
+├── helpers/
+│   └── snackbar_helper.dart
 │
 ├── models/
 │   └── task.dart
 │
 ├── screens/
+│   ├── splash_screen.dart
 │   └── todo_home_page.dart
 │
-└── services/
-    ├── audio_service.dart
-    └── task_storage.dart
+├── services/
+│   ├── audio_service.dart
+│   ├── image_task_service.dart
+│   └── task_storage.dart
+│
+├── widgets/
+│   └── task_input_bar.dart
+│
+├── app.dart
+└── main.dart
 ```
+
+### Folder Responsibilities
+
+| Folder | Responsibility |
+|---|---|
+| `constants/` | Application-wide constants |
+| `controllers/` | Task-related application logic |
+| `helpers/` | Reusable helper utilities |
+| `models/` | Application data models |
+| `screens/` | Application screens |
+| `services/` | Storage, OCR, and audio services |
+| `widgets/` | Reusable UI components |
 
 ---
 
-## ⚙️ Installation
+## 🚀 Getting Started
 
-### 1. Clone the repository
+### Prerequisites
+
+Make sure Flutter is installed and configured correctly.
+
+```bash
+flutter doctor
+```
+
+### Installation
 
 ```bash
 git clone https://github.com/rohiitt405/flutter-todo-list.git
-```
-
-### 2. Move into the project directory
-
-```bash
 cd flutter-todo-list
-```
-
-### 3. Install dependencies
-
-```bash
 flutter pub get
-```
-
-### 4. Launch the app
-
-```bash
 flutter run
 ```
 
 ---
 
-## 📱 How It Works
+## 🔄 How It Works
 
-### Add a Task
-Enter a task in the text field and tap the **Add** button.
+### 📝 Task Management
 
-### Search
-Use the search bar to instantly filter tasks.
+Users can create, edit, complete, and delete tasks from the main task list. Changes are automatically saved to local storage.
 
-### Edit
-Tap the edit icon to modify an existing task.
+### 🔍 Search
 
-### Complete
-Tap the checkbox to mark a task as completed.
+The search field allows users to quickly filter tasks based on their title.
 
-### Delete
-Swipe a task to remove it from the list.
+### 📸 OCR Task Import
 
-### Import from Image
-Capture or choose an image containing text. The app detects text using Google ML Kit and converts it into tasks.
+Users can select or capture an image containing text. Google ML Kit extracts the text and converts it into tasks.
 
----
+### 💾 Local Persistence
 
-## 🧪 Testing
+Tasks are stored locally using **SharedPreferences**, allowing them to remain available after restarting the application.
 
-Run all widget tests:
+### 🔊 Audio Feedback
 
-```bash
-flutter test
-```
-
----
-
-## 📦 Storage
-
-Tasks are stored locally on the device using **SharedPreferences**, ensuring that your data remains available even after restarting the application.
-
----
-
-## 📸 Screenshots
-
-Place your screenshots inside a `screenshots/` folder.
-
-```
-screenshots/
-├── home.png
-├── search.png
-├── edit.png
-└── ocr.png
-```
-
-Example:
-
-| Home | Search | OCR |
-|------|--------|-----|
-| ![](screenshots/home.png) | ![](screenshots/search.png) | ![](screenshots/ocr.png) |
+**Audioplayers** provides audio feedback for supported user actions.
 
 ---
 
 ## 🔐 Permissions
 
-The application may request:
-
-- 📷 Camera permission (for OCR)
-- 🖼️ Gallery access (to import images)
+- 📷 **Camera** — used to capture images for OCR.
+- 🖼️ **Gallery / Photos** — used to select images for OCR.
 
 ---
 
-## 💡 Future Improvements
+## 🔮 Future Improvements
 
-- Categories and labels
-- Due dates
-- Task reminders
-- Dark mode
-- Cloud synchronization
-- Task priority
-- Backup & restore
-- Multiple task lists
+- 🏷️ Categories and labels
+- 📅 Due dates and reminders
+- ⭐ Task priorities
+- 🌙 Dark mode
+- ☁️ Cloud synchronization
+- 💾 Backup and restore
+- 📋 Multiple task lists
 
 ---
 
@@ -201,14 +232,6 @@ git push origin feature/new-feature
 ## 📄 License
 
 This project is distributed under the **MIT License**.
-
----
-
-## ❤️ Acknowledgements
-
-- Flutter Team
-- Google ML Kit
-- Flutter Community
 
 ---
 
