@@ -91,16 +91,21 @@ class _TodoHomePageState extends State<TodoHomePage> {
     setState(_refreshFilteredTasks);
   }
 
-  void _toggleSearchMode() {
-    setState(() async {
-      _isSearching = !_isSearching;
-      if (_isSearching) {
-        await _audioService.play(AppSounds.search);
-      } else {
+  Future<void> _toggleSearchMode() async {
+    final shouldSearch = !_isSearching;
+
+    setState(() {
+      _isSearching = shouldSearch;
+
+      if (!shouldSearch) {
         _searchController.clear();
         _refreshFilteredTasks();
       }
     });
+
+    if(shouldSearch) {
+      await _audioService.play(AppSounds.search);
+    }
   }
 
   Future<void> _addTask() async {
@@ -123,6 +128,10 @@ class _TodoHomePageState extends State<TodoHomePage> {
     try {
       final taskLines = await _imageTaskService.extractTasksFromCamera();
 
+      if(!mounted) {
+        return;
+      }
+
       if(taskLines.isEmpty) {
         SnackBarHelper.show(
           context, 
@@ -133,13 +142,13 @@ class _TodoHomePageState extends State<TodoHomePage> {
 
       await _taskController.addTasks(taskLines);
 
-      if(!mounted) {
-        return;
-      }
-
       setState(_syncTaskFromController);
 
       await _audioService.play(AppSounds.add);
+
+      if(!mounted) {
+        return;
+      }
 
       SnackBarHelper.show(
         context,
@@ -306,8 +315,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 250),
                     curve: Curves.easeInOut,
-                    height: 48,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    height: 50,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
@@ -335,7 +343,6 @@ class _TodoHomePageState extends State<TodoHomePage> {
                           onPressed: _toggleSearchMode,
                           tooltip: 'Search tasks',
                         ),
-                        const SizedBox(width: 12),
                         Expanded(
                           child: TextField(
                             controller: _isSearching ? _searchController : _taskInputController,
@@ -371,33 +378,43 @@ class _TodoHomePageState extends State<TodoHomePage> {
                           height: 24,
                           width: 1,
                           color: const Color(0xFFC4C7C7),
-                          margin: const EdgeInsets.symmetric(horizontal: 8),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.camera_alt_outlined, size: 20),
-                          color: const Color(0xFF4A4A4A),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          onPressed: _addTasksFromImage,
-                          tooltip: 'Add from Image',
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton(
-                          icon: Icon(
-                            _isSearching ? Icons.close : Icons.add,
-                            size: 24,
-                          ),
-                          color: _isSearching ? const Color(0xFF4A4A4A) : const Color(0xFF0055FF),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          onPressed: () {
-                            if (_isSearching) {
-                              _toggleSearchMode();
-                            } else {
-                              _addTask();
-                            }
-                          },
-                          tooltip: _isSearching ? 'Close search' : 'Add task',
+
+                        const SizedBox(width: 10),
+
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.camera_alt_outlined, size: 20),
+                              color: const Color(0xFF4A4A4A),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              visualDensity: const VisualDensity(horizontal: -4),
+                              onPressed: _addTasksFromImage,
+                              tooltip: 'Add from Image',
+                            ),
+                            const SizedBox(width: 2),
+                            IconButton(
+                              icon: Icon(
+                                _isSearching ? Icons.close : Icons.add,
+                                size: 24,
+                              ),
+                              color: _isSearching 
+                                ? const Color(0xFF4A4A4A) 
+                                : const Color(0xFF0055FF),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              onPressed: () {
+                                if (_isSearching) {
+                                  _toggleSearchMode();
+                                } else {
+                                  _addTask();
+                                }
+                              },
+                              tooltip: _isSearching ? 'Close search' : 'Add task',
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -528,11 +545,12 @@ class _TodoHomePageState extends State<TodoHomePage> {
       ),
       // BottomNavBar Shared Component
       bottomNavigationBar: Container(
+        height: 60,
         decoration: const BoxDecoration(
           color: Color(0xFFFBF9F8),
           border: Border(
             top: BorderSide(
-              color: Color(0xFFC4C7C7),
+              style: BorderStyle.none,
               width: 1.0,
             ),
           ),
@@ -545,7 +563,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
             });
           },
           backgroundColor: Colors.transparent,
-          indicatorColor: const Color(0xFFFFDAD5).withOpacity(0.5),
+          indicatorColor: const Color(0xFF8D8B8B).withValues(alpha: 0.5),
           elevation: 0,
           destinations: const [
             NavigationDestination(
@@ -554,8 +572,8 @@ class _TodoHomePageState extends State<TodoHomePage> {
               label: '',
             ),
             NavigationDestination(
-              icon: Icon(Icons.list_alt, color: Color(0xFFB71511)),
-              selectedIcon: Icon(Icons.list_alt, color: Color(0xFFB71511)),
+              icon: Icon(Icons.list_alt),
+              selectedIcon: Icon(Icons.list_alt),
               label: '',
             ),
             NavigationDestination(
