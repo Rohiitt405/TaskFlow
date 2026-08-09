@@ -5,6 +5,7 @@ import '../models/task.dart';
 import '../services/audio_service.dart';
 import '../services/image_task_service.dart';
 import '../helpers/snackbar_helper.dart';
+import '../constants/app_sounds.dart';
 
 class TodoHomePage extends StatefulWidget {
   const TodoHomePage({super.key});
@@ -69,10 +70,6 @@ class _TodoHomePageState extends State<TodoHomePage> {
     setState(_syncTaskFromController);
   }
 
-  Future<void> _playSound(String path) async {
-    await _audioService.play(path);
-  }
-
   List<Task> _applyFilter(String query) {
     final normalizedQuery = query.trim().toLowerCase();
 
@@ -92,10 +89,10 @@ class _TodoHomePageState extends State<TodoHomePage> {
   }
 
   void _toggleSearchMode() {
-    setState(() {
+    setState(() async {
       _isSearching = !_isSearching;
       if (_isSearching) {
-        _playSound('sounds/Search.mp3');
+        await _audioService.play(AppSounds.search);
       } else {
         _searchController.clear();
         _refreshFilteredTasks();
@@ -116,7 +113,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
       _taskInputController.clear();
     });
 
-    await _playSound('sounds/Add.mp3');
+    await _audioService.play(AppSounds.add);
   }
 
   Future<void> _addTasksFromImage() async {
@@ -139,7 +136,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
 
       setState(_syncTaskFromController);
 
-      await _playSound('sounds/Add.mp3');
+      await _audioService.play(AppSounds.add);
 
       SnackBarHelper.show(
         context,
@@ -165,7 +162,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
 
     setState(_syncTaskFromController);
 
-    _playSound('sounds/Delete.mp3');
+    _audioService.play(AppSounds.delete);
 
     if(!mounted) {
       return;
@@ -251,7 +248,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
 
                 setState(_syncTaskFromController);
 
-                await _playSound('sounds/Edit.mp3');
+                await _audioService.play(AppSounds.edit);
 
                 if(!mounted || !context.mounted) {
                   return;
