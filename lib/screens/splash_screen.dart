@@ -135,61 +135,14 @@ class _SplashScreenState extends State<SplashScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Spacer(),
+                    
 
                     // Animated Brand Logo Container
                     FadeTransition(
                       opacity: _logoFadeAnimation,
                       child: ScaleTransition(
                         scale: _logoScaleAnimation,
-                        child: Container(
-                          width: 104,
-                          height: 104,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Color(0xFF2C2D2E),
-                                Color(0xFF1B1C1C),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(28),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              width: 1.5,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF1B1C1C).withValues(alpha: 0.25),
-                                blurRadius: 24,
-                                offset: const Offset(0, 12),
-                              ),
-                            ],
-                          ),
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              // Accent Accent Line Effect inside logo
-                              Positioned(
-                                top: 12,
-                                right: 12,
-                                child: Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFF0055FF),
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                              ),
-                              const Icon(
-                                Icons.task_alt_rounded,
-                                size: 52,
-                                color: Color(0xFFFBF9F8),
-                              ),
-                            ],
-                          ),
-                        ),
+                        child: Image.asset('assets/icon/TaskFlow_icon.png')
                       ),
                     ),
 
