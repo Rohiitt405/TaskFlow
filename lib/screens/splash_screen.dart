@@ -142,7 +142,7 @@ class _SplashScreenState extends State<SplashScreen>
                       opacity: _logoFadeAnimation,
                       child: ScaleTransition(
                         scale: _logoScaleAnimation,
-                        child: Image.asset('assets/icon/TaskFlow_icon.png')
+                        child: Image.asset('assets/icon/TaskFlow_transparent.png')
                       ),
                     ),
 
