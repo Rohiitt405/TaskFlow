@@ -28,7 +28,6 @@ class _TodoHomePageState extends State<TodoHomePage> {
   final List<Task> _tasks = <Task>[];
   final List<Task> _filteredTasks = <Task>[];
   bool _isSearching = false;
-  int _selectedIndex = 1;
 
   @override
   void initState() {
@@ -505,32 +504,35 @@ class _TodoHomePageState extends State<TodoHomePage> {
                                   }
                                   return false;
                                 },
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(vertical: 4),
-                                  decoration: BoxDecoration(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 4),
+                                  child: Material(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: const Color(0xFFE4E2E2)),
-                                  ),
-                                  child: ListTile(
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                                    leading: Checkbox(
-                                      value: task.isDone,
-                                      activeColor: const Color(0xFF1B1C1C),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      onChanged: (_) => _toggleTask(task),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      side: const BorderSide(color: Color(0xFFE4E2E2)),
                                     ),
-                                    title: Text(
-                                      task.title,
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        color: task.isDone ? const Color(0xFF747878) : const Color(0xFF1B1C1C),
-                                        decoration: task.isDone ? TextDecoration.lineThrough : TextDecoration.none,
+                                    clipBehavior: Clip.antiAlias,
+                                    child: ListTile(
+                                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                                      leading: Checkbox(
+                                        value: task.isDone,
+                                        activeColor: const Color(0xFF1B1C1C),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        onChanged: (_) => _toggleTask(task),
                                       ),
+                                      title: Text(
+                                        task.title,
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: task.isDone ? const Color(0xFF747878) : const Color(0xFF1B1C1C),
+                                          decoration: task.isDone ? TextDecoration.lineThrough : TextDecoration.none,
+                                        ),
+                                      ),
+                                      onTap: () => _toggleTask(task),
                                     ),
-                                    onTap: () => _toggleTask(task),
                                   ),
                                 ),
                               );
@@ -541,52 +543,6 @@ class _TodoHomePageState extends State<TodoHomePage> {
               ),
             ),
           ),
-        ),
-      ),
-      // BottomNavBar Shared Component
-      bottomNavigationBar: Container(
-        height: 60,
-        decoration: const BoxDecoration(
-          color: Color(0xFFFBF9F8),
-          border: Border(
-            top: BorderSide(
-              style: BorderStyle.none,
-              width: 1.0,
-            ),
-          ),
-        ),
-        child: NavigationBar(
-          selectedIndex: _selectedIndex,
-          onDestinationSelected: (int index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
-          backgroundColor: Colors.transparent,
-          indicatorColor: const Color(0xFF8D8B8B).withValues(alpha: 0.5),
-          elevation: 0,
-          destinations: const [
-            NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home),
-              label: '',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.list_alt),
-              selectedIcon: Icon(Icons.list_alt),
-              label: '',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.calendar_today_outlined),
-              selectedIcon: Icon(Icons.calendar_today),
-              label: '',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.settings_outlined),
-              selectedIcon: Icon(Icons.settings),
-              label: '',
-            ),
-          ],
         ),
       ),
     );
