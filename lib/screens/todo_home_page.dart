@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../controllers/task_controller.dart';
+import '../providers/task_provider.dart';
 import '../models/task.dart';
 import '../services/audio_service.dart';
 import '../services/image_task_service.dart';
@@ -17,7 +17,7 @@ class TodoHomePage extends StatefulWidget {
 
 class _TodoHomePageState extends State<TodoHomePage> {
   final AudioService _audioService = AudioService();
-  final TaskController _taskController = TaskController(
+  final TaskProvider _taskProvider = TaskProvider(
     taskStorage: TaskStorage(),
   );
   final ImageTaskService _imageTaskService = ImageTaskService();
@@ -42,14 +42,14 @@ class _TodoHomePageState extends State<TodoHomePage> {
     _searchController.dispose();
     _taskInputController.dispose();
     _audioService.dispose();
-    _taskController.dispose();
+    _taskProvider.dispose();
     super.dispose();
   }
 
   void _syncTaskFromController() {
     _tasks
       ..clear()
-      ..addAll(_taskController.tasks);
+      ..addAll(_taskProvider.tasks);
 
     _refreshFilteredTasks();
   }
@@ -63,7 +63,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
   }
 
   Future<void> _loadTasks() async {
-    await _taskController.loadTasks();
+    await _taskProvider.loadTasks();
 
     if (!mounted) {
       return;
@@ -113,7 +113,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
       return;
     }
 
-    await _taskController.addTask(text);
+    await _taskProvider.addTask(text);
 
     setState(() {
       _syncTaskFromController();
@@ -139,7 +139,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
         return;
       }
 
-      await _taskController.addTasks(taskLines);
+      await _taskProvider.addTasks(taskLines);
 
       setState(_syncTaskFromController);
 
@@ -165,7 +165,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
   Future<void> _deleteTask(Task task) async {
     final deletedTask = task.copyWith();
 
-    await _taskController.deleteTask(task);
+    await _taskProvider.deleteTask(task);
 
     if(!mounted) {
       return;
@@ -185,7 +185,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
       action: SnackBarAction(
         label: 'Undo',
         onPressed: () async {
-          await _taskController.restoreTask(deletedTask);
+          await _taskProvider.restoreTask(deletedTask);
 
           if(!mounted) {
             return;
@@ -198,7 +198,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
   }
 
   Future<void> _toggleTask(Task task) async {
-    await _taskController.toggleTask(task);
+    await _taskProvider.toggleTask(task);
 
     if(!mounted) {
       return;
@@ -248,7 +248,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
                   return;
                 }
 
-                await _taskController.editTask(
+                await _taskProvider.editTask(
                   task, 
                   newTitle
                 );

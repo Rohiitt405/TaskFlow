@@ -3,8 +3,8 @@ import 'package:flutter/foundation.dart';
 import '../models/task.dart';
 import '../services/task_storage.dart';
 
-class TaskController extends ChangeNotifier {
-  TaskController({
+class TaskProvider extends ChangeNotifier {
+  TaskProvider({
     required TaskStorage? taskStorage,
   }) : _taskStorage = taskStorage ?? TaskStorage();
 
