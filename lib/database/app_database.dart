@@ -29,7 +29,7 @@ class AppDatabase {
           CREATE TABLE tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
-            isCompleted INTEGER NOT NULL DEFAULT 0,
+            isDone INTEGER NOT NULL DEFAULT 0,
             createdAt TEXT NOT NULL
           )
         ''');
