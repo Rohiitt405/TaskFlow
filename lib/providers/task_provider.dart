@@ -4,9 +4,8 @@ import '../models/task.dart';
 import '../services/task_storage.dart';
 
 class TaskProvider extends ChangeNotifier {
-  TaskProvider({
-    required TaskStorage? taskStorage,
-  }) : _taskStorage = taskStorage ?? TaskStorage();
+  TaskProvider({TaskStorage? taskStorage})
+      : _taskStorage = taskStorage ?? TaskStorage();
 
   final TaskStorage _taskStorage;
   final List<Task> _tasks = [];
@@ -14,7 +13,7 @@ class TaskProvider extends ChangeNotifier {
   List<Task> get tasks => List.unmodifiable(_tasks);
 
   Future<void> loadTasks() async {
-    final loadedTasks = await _taskStorage.loadTasks();
+    final loadedTasks = await _taskStorage.getTasks();
 
     _tasks
       ..clear()
@@ -23,76 +22,61 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> saveTasks() async {
-    await _taskStorage.saveTasks(_tasks);
-  }
-
   Future<void> addTask(String title) async {
     final text = title.trim();
 
-    if (text.isEmpty) {
-      return;
-    }
+    if (text.isEmpty) return;
 
-    _tasks.add(
-      Task(
-        id: _createTaskId(),
-        title: text,
-      ),
-    );
+    final task = Task(title: text);
+    final id = await _taskStorage.addTask(task);
 
-    await saveTasks();
+    _tasks.add(task.copyWith(id: id));
     notifyListeners();
   }
 
   Future<void> addTasks(List<String> titles) async {
     for (final title in titles) {
-      final text = title.trim();
-
-      if(text.isEmpty) {
-        continue;
-      }
-
-      _tasks.add(
-        Task(
-          id: _createTaskId(), 
-          title: text
-        ),
-      );
-
-      await saveTasks();
-      notifyListeners();
+      await addTask(title);
     }
   }
 
   Future<void> deleteTask(Task task) async {
-    _tasks.removeWhere(
-      (item) => item.id == task.id,
-    );
+    final id = task.id;
+    if (id == null) return;
 
-    await saveTasks();
+    await _taskStorage.deleteTask(id);
+
+    _tasks.removeWhere((item) => item.id == id);
     notifyListeners();
   }
 
-  String _createTaskId() {
-    return DateTime.now().microsecondsSinceEpoch.toString();
-  }
-
   Future<void> restoreTask(Task task) async {
-    _tasks.add(task);
+    final restoredTask = Task(
+      title: task.title,
+      isDone: task.isDone,
+      createdAt: task.createdAt,
+    );
 
-    await saveTasks();
+    final id = await _taskStorage.addTask(restoredTask);
+
+    _tasks.add(restoredTask.copyWith(id: id));
     notifyListeners();
   }
 
   Future<void> toggleTask(Task task) async {
-    final taskToUpdate = _tasks.firstWhere(
+    final index = _tasks.indexWhere(
       (item) => item.id == task.id,
     );
 
-    taskToUpdate.isDone = !taskToUpdate.isDone;
+    if (index == -1) return;
 
-    await saveTasks();
+    final updatedTask = _tasks[index].copyWith(
+      isDone: !_tasks[index].isDone,
+    );
+
+    await _taskStorage.updateTask(updatedTask);
+
+    _tasks[index] = updatedTask;
     notifyListeners();
   }
 
@@ -102,17 +86,31 @@ class TaskProvider extends ChangeNotifier {
   ) async {
     final title = newTitle.trim();
 
-    if (title.isEmpty) {
-      return;
-    }
+    if (title.isEmpty) return;
 
-    final taskToUpdate = _tasks.firstWhere(
+    final index = _tasks.indexWhere(
       (item) => item.id == task.id,
     );
 
-    taskToUpdate.title = title;
+    if (index == -1) return;
 
-    await saveTasks();
+    final updatedTask = _tasks[index].copyWith(
+      title: title,
+    );
+
+    await _taskStorage.updateTask(updatedTask);
+
+    _tasks[index] = updatedTask;
     notifyListeners();
+  }
+
+  List<Task> searchTasks(String query) {
+    final text = query.trim().toLowerCase();
+
+    if (text.isEmpty) return tasks;
+
+    return _tasks
+        .where((task) => task.title.toLowerCase().contains(text))
+        .toList();
   }
 }
