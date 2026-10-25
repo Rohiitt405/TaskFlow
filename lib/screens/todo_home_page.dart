@@ -102,12 +102,12 @@ class _TodoHomePageState extends State<TodoHomePage> {
   }
 
   Future<void> _addTask() async {
-    final text = _taskInputController.text.trim();
-    if (text.isEmpty) {
+    final title = _taskInputController.text.trim();
+    if (title.isEmpty) {
       return;
     }
 
-    await _taskProvider.addTask(text);
+    await _taskProvider.addTask(title);
 
     setState(() {
       _syncTaskFromController();
@@ -115,6 +115,12 @@ class _TodoHomePageState extends State<TodoHomePage> {
     });
 
     await _audioService.play(AppSounds.add);
+
+    if (!mounted) {
+      return;
+    }
+
+    SnackBarHelper.show(context, 'Added: ${title}');
   }
 
   Future<void> _addTasksFromImage() async {
