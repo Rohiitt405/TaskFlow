@@ -13,10 +13,7 @@ class TodoApp extends StatelessWidget {
         useMaterial3: true,
         colorSchemeSeed: Colors.blue,
         scaffoldBackgroundColor: Colors.grey.shade100,
-        appBarTheme: const AppBarTheme(
-          centerTitle: true,
-          elevation: 0,
-        )
+        appBarTheme: const AppBarTheme(centerTitle: true, elevation: 0),
       ),
       home: const SplashScreen(),
     );

@@ -43,15 +43,13 @@ class _SplashScreenState extends State<SplashScreen>
       curve: const Interval(0.4, 1.0, curve: Curves.easeOut),
     );
 
-    _textSlideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.2),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.4, 1.0, curve: Curves.easeOutCubic),
-      ),
-    );
+    _textSlideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.4, 1.0, curve: Curves.easeOutCubic),
+          ),
+        );
 
     _controller.forward();
     _navigateToHome();
@@ -68,10 +66,7 @@ class _SplashScreenState extends State<SplashScreen>
         pageBuilder: (context, animation, secondaryAnimation) =>
             const TodoHomePage(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(
-            opacity: animation,
-            child: child,
-          );
+          return FadeTransition(opacity: animation, child: child);
         },
         transitionDuration: const Duration(milliseconds: 500),
       ),
@@ -135,14 +130,15 @@ class _SplashScreenState extends State<SplashScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Spacer(),
-                    
 
                     // Animated Brand Logo Container
                     FadeTransition(
                       opacity: _logoFadeAnimation,
                       child: ScaleTransition(
                         scale: _logoScaleAnimation,
-                        child: Image.asset('assets/icon/TaskFlow_transparent.png')
+                        child: Image.asset(
+                          'assets/icon/TaskFlow_transparent.png',
+                        ),
                       ),
                     ),
 
@@ -174,7 +170,9 @@ class _SplashScreenState extends State<SplashScreen>
                                   color: const Color(0xFFC4C7C7),
                                 ),
                                 const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 12.0),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 12.0,
+                                  ),
                                   child: Text(
                                     'PRECISION PRODUCTIVITY',
                                     style: TextStyle(
@@ -220,7 +218,9 @@ class _SplashScreenState extends State<SplashScreen>
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
-                              color: const Color(0xFF747878).withValues(alpha: 0.8),
+                              color: const Color(
+                                0xFF747878,
+                              ).withValues(alpha: 0.8),
                               letterSpacing: 0.3,
                             ),
                           ),

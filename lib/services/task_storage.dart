@@ -12,10 +12,7 @@ class TaskStorage {
   Future<List<Task>> getTasks() async {
     final db = await _database;
 
-    final result = await db.query(
-      'tasks',
-      orderBy: 'id DESC',
-    );
+    final result = await db.query('tasks', orderBy: 'id DESC');
 
     return result.map((map) => Task.fromMap(map)).toList();
   }
@@ -38,22 +35,13 @@ class TaskStorage {
     final map = task.toMap();
     map.remove('id');
 
-    return db.update(
-      'tasks',
-      map,
-      where: 'id = ?',
-      whereArgs: [task.id],
-    );
+    return db.update('tasks', map, where: 'id = ?', whereArgs: [task.id]);
   }
 
   Future<int> deleteTask(int id) async {
     final db = await _database;
 
-    return db.delete(
-      'tasks',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    return db.delete('tasks', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<List<Task>> searchTasks(String query) async {

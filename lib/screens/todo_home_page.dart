@@ -17,9 +17,7 @@ class TodoHomePage extends StatefulWidget {
 
 class _TodoHomePageState extends State<TodoHomePage> {
   final AudioService _audioService = AudioService();
-  final TaskProvider _taskProvider = TaskProvider(
-    taskStorage: TaskStorage(),
-  );
+  final TaskProvider _taskProvider = TaskProvider(taskStorage: TaskStorage());
   final ImageTaskService _imageTaskService = ImageTaskService();
 
   final TextEditingController _taskInputController = TextEditingController();
@@ -57,9 +55,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
   void _refreshFilteredTasks() {
     _filteredTasks
       ..clear()
-      ..addAll(
-        _applyFilter(_searchController.text),
-      );
+      ..addAll(_applyFilter(_searchController.text));
   }
 
   Future<void> _loadTasks() async {
@@ -80,10 +76,8 @@ class _TodoHomePageState extends State<TodoHomePage> {
     }
 
     return _tasks
-      .where(
-        (task) => task.title.toLowerCase().contains(query)
-      )
-      .toList();
+        .where((task) => task.title.toLowerCase().contains(query))
+        .toList();
   }
 
   void _filterTasks() {
@@ -102,7 +96,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
       }
     });
 
-    if(shouldSearch) {
+    if (shouldSearch) {
       await _audioService.play(AppSounds.search);
     }
   }
@@ -127,15 +121,12 @@ class _TodoHomePageState extends State<TodoHomePage> {
     try {
       final taskLines = await _imageTaskService.extractTasksFromCamera();
 
-      if(!mounted) {
+      if (!mounted) {
         return;
       }
 
-      if(taskLines.isEmpty) {
-        SnackBarHelper.show(
-          context, 
-          'No valid tasks found in the image.',
-        );
+      if (taskLines.isEmpty) {
+        SnackBarHelper.show(context, 'No valid tasks found in the image.');
         return;
       }
 
@@ -145,7 +136,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
 
       await _audioService.play(AppSounds.add);
 
-      if(!mounted) {
+      if (!mounted) {
         return;
       }
 
@@ -153,12 +144,8 @@ class _TodoHomePageState extends State<TodoHomePage> {
         context,
         'Added ${taskLines.length} task${taskLines.length == 1 ? '' : 's'} from the image.',
       );
-
     } catch (error) {
-      SnackBarHelper.show(
-        context,
-        'Error: $error'
-      );
+      SnackBarHelper.show(context, 'Error: $error');
     }
   }
 
@@ -167,7 +154,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
 
     await _taskProvider.deleteTask(task);
 
-    if(!mounted) {
+    if (!mounted) {
       return;
     }
 
@@ -175,7 +162,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
 
     _audioService.play(AppSounds.delete);
 
-    if(!mounted) {
+    if (!mounted) {
       return;
     }
 
@@ -187,7 +174,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
         onPressed: () async {
           await _taskProvider.restoreTask(deletedTask);
 
-          if(!mounted) {
+          if (!mounted) {
             return;
           }
 
@@ -200,7 +187,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
   Future<void> _toggleTask(Task task) async {
     await _taskProvider.toggleTask(task);
 
-    if(!mounted) {
+    if (!mounted) {
       return;
     }
 
@@ -215,10 +202,15 @@ class _TodoHomePageState extends State<TodoHomePage> {
       builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: const Color(0xFFFBF9F8),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: const Text(
             'Edit Task',
-            style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1B1C1C)),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1B1C1C),
+            ),
           ),
           content: TextField(
             controller: editController,
@@ -234,13 +226,18 @@ class _TodoHomePageState extends State<TodoHomePage> {
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Cancel', style: TextStyle(color: Color(0xFF747878))),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Color(0xFF747878)),
+              ),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1B1C1C),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               onPressed: () async {
                 final newTitle = editController.text.trim();
@@ -248,12 +245,9 @@ class _TodoHomePageState extends State<TodoHomePage> {
                   return;
                 }
 
-                await _taskProvider.editTask(
-                  task, 
-                  newTitle
-                );
+                await _taskProvider.editTask(task, newTitle);
 
-                if(!mounted) {
+                if (!mounted) {
                   return;
                 }
 
@@ -261,12 +255,11 @@ class _TodoHomePageState extends State<TodoHomePage> {
 
                 await _audioService.play(AppSounds.edit);
 
-                if(!mounted || !context.mounted) {
+                if (!mounted || !context.mounted) {
                   return;
                 }
 
                 Navigator.pop(dialogContext);
-
               },
               child: const Text('Save'),
             ),
@@ -295,10 +288,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0),
-          child: Container(
-            color: const Color(0xFFC4C7C7),
-            height: 1.0,
-          ),
+          child: Container(color: const Color(0xFFC4C7C7), height: 1.0),
         ),
       ),
       // Main Content
@@ -307,7 +297,10 @@ class _TodoHomePageState extends State<TodoHomePage> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 896),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 16.0,
+              ),
               child: Column(
                 children: [
                   // Search & Entry Bar
@@ -319,7 +312,9 @@ class _TodoHomePageState extends State<TodoHomePage> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: _isSearching ? const Color(0xFF1A1A1A) : const Color(0xFFE0E0E0),
+                        color: _isSearching
+                            ? const Color(0xFF1A1A1A)
+                            : const Color(0xFFE0E0E0),
                       ),
                       boxShadow: const [
                         BoxShadow(
@@ -335,7 +330,9 @@ class _TodoHomePageState extends State<TodoHomePage> {
                           icon: Icon(
                             Icons.search,
                             size: 20,
-                            color: _isSearching ? const Color(0xFF0055FF) : const Color(0xFF4A4A4A),
+                            color: _isSearching
+                                ? const Color(0xFF0055FF)
+                                : const Color(0xFF4A4A4A),
                           ),
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
@@ -344,10 +341,14 @@ class _TodoHomePageState extends State<TodoHomePage> {
                         ),
                         Expanded(
                           child: TextField(
-                            controller: _isSearching ? _searchController : _taskInputController,
+                            controller: _isSearching
+                                ? _searchController
+                                : _taskInputController,
                             autofocus: false,
                             textCapitalization: TextCapitalization.sentences,
-                            onChanged: _isSearching ? (_) => _filterTasks() : null,
+                            onChanged: _isSearching
+                                ? (_) => _filterTasks()
+                                : null,
                             onSubmitted: (value) {
                               if (_isSearching) {
                                 _filterTasks();
@@ -360,7 +361,9 @@ class _TodoHomePageState extends State<TodoHomePage> {
                               color: Color(0xFF1B1C1C),
                             ),
                             decoration: InputDecoration(
-                              hintText: _isSearching ? 'Search tasks...' : 'Enter a task...',
+                              hintText: _isSearching
+                                  ? 'Search tasks...'
+                                  : 'Enter a task...',
                               hintStyle: const TextStyle(
                                 fontSize: 14,
                                 color: Color(0xFF444748),
@@ -385,11 +388,16 @@ class _TodoHomePageState extends State<TodoHomePage> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.camera_alt_outlined, size: 20),
+                              icon: const Icon(
+                                Icons.camera_alt_outlined,
+                                size: 20,
+                              ),
                               color: const Color(0xFF4A4A4A),
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
-                              visualDensity: const VisualDensity(horizontal: -4),
+                              visualDensity: const VisualDensity(
+                                horizontal: -4,
+                              ),
                               onPressed: _addTasksFromImage,
                               tooltip: 'Add from Image',
                             ),
@@ -399,9 +407,9 @@ class _TodoHomePageState extends State<TodoHomePage> {
                                 _isSearching ? Icons.close : Icons.add,
                                 size: 24,
                               ),
-                              color: _isSearching 
-                                ? const Color(0xFF4A4A4A) 
-                                : const Color(0xFF0055FF),
+                              color: _isSearching
+                                  ? const Color(0xFF4A4A4A)
+                                  : const Color(0xFF0055FF),
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
                               onPressed: () {
@@ -411,7 +419,9 @@ class _TodoHomePageState extends State<TodoHomePage> {
                                   _addTask();
                                 }
                               },
-                              tooltip: _isSearching ? 'Close search' : 'Add task',
+                              tooltip: _isSearching
+                                  ? 'Close search'
+                                  : 'Add task',
                             ),
                           ],
                         ),
@@ -474,52 +484,74 @@ class _TodoHomePageState extends State<TodoHomePage> {
                               return Dismissible(
                                 key: ValueKey(task.id),
                                 background: Container(
-                                  margin: const EdgeInsets.symmetric(vertical: 4),
+                                  margin: const EdgeInsets.symmetric(
+                                    vertical: 4,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFBA1A1A),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   alignment: Alignment.centerLeft,
                                   padding: const EdgeInsets.only(left: 20),
-                                  child: const Icon(Icons.delete_outline, color: Colors.white),
+                                  child: const Icon(
+                                    Icons.delete_outline,
+                                    color: Colors.white,
+                                  ),
                                 ),
                                 secondaryBackground: Container(
-                                  margin: const EdgeInsets.symmetric(vertical: 4),
+                                  margin: const EdgeInsets.symmetric(
+                                    vertical: 4,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFF537AFF),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   alignment: Alignment.centerRight,
                                   padding: const EdgeInsets.only(right: 20),
-                                  child: const Icon(Icons.edit_outlined, color: Colors.white),
+                                  child: const Icon(
+                                    Icons.edit_outlined,
+                                    color: Colors.white,
+                                  ),
                                 ),
                                 confirmDismiss: (direction) async {
-                                  if (direction == DismissDirection.startToEnd) {
+                                  if (direction ==
+                                      DismissDirection.startToEnd) {
                                     await _deleteTask(task);
                                     return true;
                                   }
-                                  if (direction == DismissDirection.endToStart) {
+                                  if (direction ==
+                                      DismissDirection.endToStart) {
                                     _editTask(task);
                                     return false;
                                   }
                                   return false;
                                 },
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 4,
+                                  ),
                                   child: Material(
                                     color: Colors.white,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      side: const BorderSide(color: Color(0xFFE4E2E2)),
+                                      side: const BorderSide(
+                                        color: Color(0xFFE4E2E2),
+                                      ),
                                     ),
                                     clipBehavior: Clip.antiAlias,
                                     child: ListTile(
-                                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                            vertical: 4,
+                                          ),
                                       leading: Checkbox(
                                         value: task.isDone,
                                         activeColor: const Color(0xFF1B1C1C),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(4),
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
                                         ),
                                         onChanged: (_) => _toggleTask(task),
                                       ),
@@ -527,8 +559,12 @@ class _TodoHomePageState extends State<TodoHomePage> {
                                         task.title,
                                         style: TextStyle(
                                           fontSize: 15,
-                                          color: task.isDone ? const Color(0xFF747878) : const Color(0xFF1B1C1C),
-                                          decoration: task.isDone ? TextDecoration.lineThrough : TextDecoration.none,
+                                          color: task.isDone
+                                              ? const Color(0xFF747878)
+                                              : const Color(0xFF1B1C1C),
+                                          decoration: task.isDone
+                                              ? TextDecoration.lineThrough
+                                              : TextDecoration.none,
                                         ),
                                       ),
                                       onTap: () => _toggleTask(task),

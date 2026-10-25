@@ -19,8 +19,7 @@ class ImageTaskService {
     final TextRecognizer textRecognizer = TextRecognizer();
 
     try {
-      final RecognizedText recognizedText =
-          await textRecognizer.processImage(
+      final RecognizedText recognizedText = await textRecognizer.processImage(
         InputImage.fromFile(imageFile),
       );
 

@@ -4,19 +4,10 @@ class Task {
   final bool isDone;
   final String createdAt;
 
-  Task({
-    this.id,
-    required this.title,
-    this.isDone = false,
-    String? createdAt,
-  }) : createdAt = createdAt ?? DateTime.now().toIso8601String();
+  Task({this.id, required this.title, this.isDone = false, String? createdAt})
+    : createdAt = createdAt ?? DateTime.now().toIso8601String();
 
-  Task copyWith({
-    int? id, 
-    String? title, 
-    bool? isDone,
-    String? createdAt,
-  }) {
+  Task copyWith({int? id, String? title, bool? isDone, String? createdAt}) {
     return Task(
       id: id ?? this.id,
       title: title ?? this.title,
@@ -27,12 +18,12 @@ class Task {
 
   Map<String, dynamic> toMap() {
     return {
-        'id': id,
-        'title': title,
-        'isDone': isDone ? 1 : 0,
-        'createdAt': createdAt,
-      };
-    }
+      'id': id,
+      'title': title,
+      'isDone': isDone ? 1 : 0,
+      'createdAt': createdAt,
+    };
+  }
 
   factory Task.fromMap(Map<String, dynamic> map) {
     return Task(

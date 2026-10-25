@@ -5,7 +5,7 @@ import '../services/task_storage.dart';
 
 class TaskProvider extends ChangeNotifier {
   TaskProvider({TaskStorage? taskStorage})
-      : _taskStorage = taskStorage ?? TaskStorage();
+    : _taskStorage = taskStorage ?? TaskStorage();
 
   final TaskStorage _taskStorage;
   final List<Task> _tasks = [];
@@ -64,15 +64,11 @@ class TaskProvider extends ChangeNotifier {
   }
 
   Future<void> toggleTask(Task task) async {
-    final index = _tasks.indexWhere(
-      (item) => item.id == task.id,
-    );
+    final index = _tasks.indexWhere((item) => item.id == task.id);
 
     if (index == -1) return;
 
-    final updatedTask = _tasks[index].copyWith(
-      isDone: !_tasks[index].isDone,
-    );
+    final updatedTask = _tasks[index].copyWith(isDone: !_tasks[index].isDone);
 
     await _taskStorage.updateTask(updatedTask);
 
@@ -80,23 +76,16 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> editTask(
-    Task task,
-    String newTitle,
-  ) async {
+  Future<void> editTask(Task task, String newTitle) async {
     final title = newTitle.trim();
 
     if (title.isEmpty) return;
 
-    final index = _tasks.indexWhere(
-      (item) => item.id == task.id,
-    );
+    final index = _tasks.indexWhere((item) => item.id == task.id);
 
     if (index == -1) return;
 
-    final updatedTask = _tasks[index].copyWith(
-      title: title,
-    );
+    final updatedTask = _tasks[index].copyWith(title: title);
 
     await _taskStorage.updateTask(updatedTask);
 
