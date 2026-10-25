@@ -1,12 +1,10 @@
-# 📋 TaskFlow — Flutter Todo List
+# 📋 TaskFlow: Flutter Todo List
 
-A lightweight and user-friendly **Todo List application built with Flutter** for managing daily tasks with local persistence, search, editing, completion tracking, audio feedback, and OCR-powered task creation from images.
-
----
+A lightweight, offline-first **Todo List application built with Flutter** for managing daily tasks with local SQLite persistence, live search, editing, completion tracking, audio feedback, and OCR-powered task creation from images.
 
 ## 🌟 Overview
 
-**TaskFlow** is an offline-first Flutter todo application designed to keep task management simple and practical.
+**TaskFlow** is a Flutter todo application designed to make daily task management simple and practical.
 
 Users can:
 
@@ -14,14 +12,12 @@ Users can:
 - 🔍 Search tasks instantly
 - ✏️ Edit task titles
 - ✅ Mark tasks as completed or incomplete
-- 🗑️ Delete tasks with swipe actions
-- 💾 Persist tasks locally on the device
-- 📸 Extract text from images and use it to create tasks
+- 🗑️ Delete tasks using swipe actions
+- 💾 Store tasks locally using SQLite
+- 📸 Extract text from images and convert it into tasks
 - 🔊 Get audio feedback for supported user actions
 
-The application does not require a backend or an internet connection for its core task-management functionality.
-
----
+The application works offline for its core task-management features and does not require a backend or internet connection.
 
 ## ✨ Features
 
@@ -31,29 +27,35 @@ The application does not require a backend or an internet connection for its cor
 - Edit existing task titles
 - Mark tasks as completed or incomplete
 - Delete tasks using swipe actions
-- Persist tasks between application launches
+- Restore deleted tasks where supported by the UI
+- Automatically persist task changes in the local database
 
 ### 🔍 Task Search
 
-- Live search through existing tasks
+- Search tasks by title
 - Filter tasks as the user types
+- Display matching tasks instantly using local filtering
 
 ### 📸 OCR Task Import
 
-- Select or capture an image using the image picker
-- Extract text from the image using **Google ML Kit Text Recognition**
+- Select an image from the gallery or capture one using the camera
+- Extract text using Google ML Kit Text Recognition
 - Convert detected text into tasks
+- Save imported tasks in the local SQLite database
 
-### 💾 Local Storage
+### 💾 SQLite Local Storage
 
-- Store tasks locally using **SharedPreferences**
-- Access tasks without a backend
-- Preserve tasks after restarting the application
+- Store tasks in a local SQLite database using `sqflite`
+- Create and manage a `tasks` table
+- Insert, read, update, and delete tasks using SQL operations
+- Preserve tasks between application launches
+- Store task titles, completion status, unique IDs, and creation timestamps
+- Work without a remote database or backend
 
 ### 🔊 Audio Feedback
 
 - Provide audio feedback for supported user actions
-- Keep audio-related logic separated inside the audio service
+- Keep audio playback logic separate in the audio service
 
 ### 🎨 User Interface
 
@@ -61,35 +63,39 @@ The application does not require a backend or an internet connection for its cor
 - Clean and lightweight interface
 - Reusable task input widget
 - Snackbar-based user feedback
-
----
+- Provider-based state management
 
 ## 🛠️ Tech Stack
 
 | Technology | Purpose |
 |---|---|
-| **Flutter** | Application framework |
-| **Dart** | Programming language |
-| **Material 3** | UI and design system |
-| **SharedPreferences** | Local task persistence |
-| **Google ML Kit Text Recognition** | OCR and text extraction |
-| **Image Picker** | Camera and gallery image selection |
-| **Audioplayers** | Audio feedback |
-
----
+| Flutter | Application framework |
+| Dart | Programming language |
+| Material 3 | UI and design system |
+| Provider | State management |
+| SQLite | Local relational database |
+| `sqflite` | SQLite database operations in Flutter |
+| `path` | Build platform-compatible database file paths |
+| Google ML Kit Text Recognition | OCR and text extraction |
+| `image_picker` | Camera and gallery image selection |
+| `audioplayers` | Audio feedback |
+| `cupertino_icons` | iOS-style icons |
 
 ## 📦 Dependencies
 
 ```yaml
 dependencies:
-  shared_preferences: ^2.5.3              # stores task data locally on the device
-  audioplayers: ^6.5.1                    # provides audio playback for user feedback
-  google_mlkit_text_recognition: ^0.16.0  # extracts text from images using OCR
-  image_picker: ^1.2.0                    # selects images from the camera or gallery
-  cupertino_icons: ^1.0.8                 # provides icons for iOS-style UI
-```
+  flutter:
+    sdk: flutter
 
-----
+  provider: # State management
+  sqflite: # SQLite database operations
+  path: # Database file paths
+  audioplayers: # Audio feedback
+  google_mlkit_text_recognition: # OCR text extraction
+  image_picker: # Camera and gallery image selection
+  cupertino_icons: # iOS-style icons
+```
 
 ## 📂 Project Structure
 
@@ -99,14 +105,17 @@ lib/
 ├── constants/
 │   └── app_sounds.dart
 │
-├── controllers/
-│   └── task_controller.dart
+├── database/
+│   └── app_database.dart
 │
 ├── helpers/
 │   └── snackbar_helper.dart
 │
 ├── models/
 │   └── task.dart
+│
+├── providers/
+│   └── task_provider.dart
 │
 ├── screens/
 │   ├── splash_screen.dart
@@ -129,14 +138,47 @@ lib/
 | Folder | Responsibility |
 |---|---|
 | `constants/` | Application-wide constants |
-| `controllers/` | Task-related application logic |
+| `database/` | SQLite database initialization and configuration |
 | `helpers/` | Reusable helper utilities |
-| `models/` | Application data models |
+| `models/` | Task data model and database mapping |
+| `providers/` | Task state management using Provider |
 | `screens/` | Application screens |
-| `services/` | Storage, OCR, and audio services |
+| `services/` | Database operations, OCR, and audio playback |
 | `widgets/` | Reusable UI components |
 
----
+## 🗄️ Database Design
+
+TaskFlow uses SQLite to store tasks locally on the device.
+
+### Tasks Table
+
+```sql
+CREATE TABLE tasks (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  isDone INTEGER NOT NULL DEFAULT 0,
+  createdAt TEXT NOT NULL
+);
+```
+
+### Column Description
+
+| Column | Description |
+|---|---|
+| `id` | Unique task ID generated by SQLite |
+| `title` | Task title |
+| `isDone` | Completion status: `0` for incomplete, `1` for completed |
+| `createdAt` | Task creation timestamp |
+
+### Database Operations
+
+TaskFlow performs standard CRUD operations:
+
+- **Create:** Insert a new task into the database.
+- **Read:** Retrieve saved tasks when the app loads.
+- **Update:** Modify a task title or completion status.
+- **Delete:** Remove a task using its database ID.
+- **Search:** Filter tasks by title.
 
 ## 🚀 Getting Started
 
@@ -150,45 +192,55 @@ flutter doctor
 
 ### Installation
 
+Clone the repository:
+
 ```bash
 git clone https://github.com/rohiitt405/flutter-todo-list.git
 cd flutter-todo-list
-flutter pub get
-flutter run
 ```
 
----
+Install dependencies:
+
+```bash
+flutter pub get
+```
+
+Run the application:
+
+```bash
+flutter run
+```
 
 ## 🔄 How It Works
 
 ### 📝 Task Management
 
-Users can create, edit, complete, and delete tasks from the main task list. Changes are automatically saved to local storage.
+Users create, edit, complete, and delete tasks from the home screen. The `TaskProvider` manages application state and calls `TaskStorage` to persist changes in SQLite.
 
 ### 🔍 Search
 
-The search field allows users to quickly filter tasks based on their title.
+The search field filters tasks by title as the user types. Search can operate on the locally loaded task list without requiring network requests.
 
 ### 📸 OCR Task Import
 
-Users can select or capture an image containing text. Google ML Kit extracts the text and converts it into tasks.
+Users select or capture an image. Google ML Kit extracts text, and the application converts the detected content into tasks that can be saved in SQLite.
 
 ### 💾 Local Persistence
 
-Tasks are stored locally using **SharedPreferences**, allowing them to remain available after restarting the application.
+The `AppDatabase` class initializes the SQLite database, while `TaskStorage` handles database queries. `TaskProvider` coordinates task operations and updates the UI through `ChangeNotifier`.
+
+Task records remain available after the application restarts.
 
 ### 🔊 Audio Feedback
 
-**Audioplayers** provides audio feedback for supported user actions.
-
----
+The audio service handles playback for supported actions independently of database and task-management logic.
 
 ## 🔐 Permissions
 
-- 📷 **Camera** — used to capture images for OCR.
-- 🖼️ **Gallery / Photos** — used to select images for OCR.
+- 📷 **Camera:** Used to capture images for OCR.
+- 🖼️ **Gallery / Photos:** Used to select images for OCR.
 
----
+Platform-specific permission configuration may be required depending on the target platform.
 
 ## 🔮 Future Improvements
 
@@ -196,15 +248,14 @@ Tasks are stored locally using **SharedPreferences**, allowing them to remain av
 - 📅 Due dates and reminders
 - ⭐ Task priorities
 - 🌙 Dark mode
-- ☁️ Cloud synchronization
+- ☁️ Optional cloud synchronization
 - 💾 Backup and restore
 - 📋 Multiple task lists
-
----
+- 🔄 Database schema migrations
 
 ## 🤝 Contributing
 
-Contributions are always welcome!
+Contributions are welcome!
 
 1. Fork this repository.
 2. Create a feature branch.
@@ -227,14 +278,12 @@ git push origin feature/new-feature
 
 5. Submit a Pull Request.
 
----
-
 ## 📄 License
 
-This project is distributed under the **MIT License**.
+This project is distributed under the MIT License.
 
 ---
 
 <p align="center">
-Made with ❤️ using Flutter
+  Made with ❤️ using Flutter
 </p>
